@@ -1,11 +1,11 @@
 const express = require("express");
 const app = express();
 
+app.use(express.json());
+
 app.get("/", (req, res) => res.send("Hello World"));
 
-port = 3000;
-
-app.listen(port, () => console.log(`running at ${port}`));
+const port = 3000;
 
 const products = [];
 
@@ -32,6 +32,7 @@ app.get("/products/:id", (req, res) => {
 });
 
 app.post("/products", (req, res) => {
+  /* return res.send('~test') */
   try {
     const product = req.body;
     const { name, price, id } = product;
@@ -41,8 +42,9 @@ app.post("/products", (req, res) => {
       products.push(product);
       res.send({ message: "product created", data: product });
     }
-  } catch {
-    (err) => console.log(err.message);
+  } catch (err) {
+    console.log(err.message);
+    res.status(400).send(err.message);
   }
 });
 
@@ -52,7 +54,7 @@ app.put("/products/:id", (req, res) => {
   const indexPosition = products.findIndex((product) => product.id == id);
   if (indexPosition >= 0) {
     products[indexPosition] = productUpdated;
-    return res.json(products[indexPosition]);
+    return res.send(products[indexPosition]);
   }
   return res.send({ message: "Product not found" });
 });
@@ -63,12 +65,13 @@ app.patch("/products/:id", (req, res) => {
   const indexPosition = products.findIndex((product) => product.id == id);
   if (indexPosition >= 0) {
     //const productToBeModified = products[indexPosition]
-    products[indexPosition] = { ...products[indexPosition], newItemModified };
+     products[indexPosition] = { ...products[indexPosition], newItemModified }; 
     //Object.assign(productToBeModified, newItemModified) //mesma coisa da linha de cima
     return res.send(products[indexPosition]);
   }
   return res.send({ message: "Product not found" });
 });
+
 
 app.delete("/products/:id", (req, res) => {
   const id = req.params.id;
@@ -80,3 +83,5 @@ app.delete("/products/:id", (req, res) => {
     res.status(404).send({ message: "Product not found" });
   }
 });
+
+app.listen(port, () => console.log(`running at ${port}`));
